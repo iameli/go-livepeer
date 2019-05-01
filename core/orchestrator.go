@@ -233,7 +233,7 @@ func (n *LivepeerNode) getSegmentChan(md *SegTranscodingMetadata) (SegmentChan, 
 }
 
 func (n *LivepeerNode) sendToTranscodeLoop(md *SegTranscodingMetadata, seg *stream.HLSSegment) (*TranscodeResult, error) {
-	glog.V(common.DEBUG).Infof("Starting to transcode segment %v", md.Seq)
+	glog.V(common.DEBUG).Infof("Starting to transcode segment %s seqNo=%d", md.ManifestID, md.Seq)
 	ch, err := n.getSegmentChan(md)
 	if err != nil {
 		glog.Error("Could not find segment chan ", err)
@@ -242,10 +242,10 @@ func (n *LivepeerNode) sendToTranscodeLoop(md *SegTranscodingMetadata, seg *stre
 	segChanData := &SegChanData{seg: seg, md: md, res: make(chan *TranscodeResult, 1)}
 	select {
 	case ch <- segChanData:
-		glog.V(common.DEBUG).Info("Submitted segment to transcode loop ", md.Seq)
+		glog.V(common.DEBUG).Infof("Submitted segment to transcode loop manifesID=%s seqNo=%d", md.ManifestID, md.Seq)
 	default:
 		// sending segChan should not block; if it does, the channel is busy
-		glog.Error("Transcoder was busy with a previous segment!")
+		glog.Errorf("Transcoder was busy with a previous segment manifesID=%s seqNo=%d", md.ManifestID, md.Seq)
 		return nil, ErrOrchBusy
 	}
 	res := <-segChanData.res
@@ -326,7 +326,7 @@ func (n *LivepeerNode) transcodeSeg(config transcodeConfig, seg *stream.HLSSegme
 	}
 	took := time.Since(start)
 	tProfileData := make(map[ffmpeg.VideoProfile][]byte, 0)
-	glog.V(common.DEBUG).Infof("Transcoding of segment %v took %v", seg.SeqNo, took)
+	glog.V(common.DEBUG).Infof("Transcoding of segment manifestID=%s seqNo=%d took %v", string(md.ManifestID), seg.SeqNo, took)
 	if isLocal && monitor.Enabled {
 		monitor.SegmentTranscoded(0, seg.SeqNo, took, 0, common.ProfilesNames(md.Profiles))
 	}
