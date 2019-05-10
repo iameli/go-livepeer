@@ -311,9 +311,6 @@ func (n *LivepeerNode) transcodeSeg(config transcodeConfig, seg *stream.HLSSegme
 		}
 		seg.Name = url
 	}
-	if isLocal && monitor.Enabled {
-		monitor.LogSegmentTranscodeStarting(seg.SeqNo, string(md.ManifestID))
-	}
 
 	//Do the transcoding
 	start := time.Now()
@@ -331,8 +328,7 @@ func (n *LivepeerNode) transcodeSeg(config transcodeConfig, seg *stream.HLSSegme
 	tProfileData := make(map[ffmpeg.VideoProfile][]byte, 0)
 	glog.V(common.DEBUG).Infof("Transcoding of segment %v took %v", seg.SeqNo, took)
 	if isLocal && monitor.Enabled {
-		monitor.LogSegmentTranscodeEnded(seg.SeqNo, string(md.ManifestID), took,
-			common.ProfilesNames(md.Profiles))
+		monitor.SegmentTranscoded(0, seg.SeqNo, took, 0, common.ProfilesNames(md.Profiles))
 	}
 
 	// Prepare the result object
