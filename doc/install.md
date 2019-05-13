@@ -45,10 +45,9 @@ docker build -t livepeerbinary:debian -f docker/Dockerfile.debian .
 docker run -it livepeerbinary:debian livepeer -version
 ```
 
-### private testnet deployments
+### Option 4: private testnet deployments
 
-to setup a full livepeer network deployment, try out our [test-harness](https://github.com/livepeer/test-harness) which
-automates the process of deploying the livepeer developer testnet. this includes
-the livepeer solidity contracts along with secondary services like a full metrics suite for debugging and a fully working livepeer nodes running locally or on Google Cloud Platform
+To setup a full Livepeer network deployment, Try out our [test-harness](https://github.com/livepeer/test-harness) which
+automates the process of deploying the Livepeer developer testnet. this includes the Livepeer solidity contracts along with secondary services like a full metrics suite for debugging and a fully working Livepeer nodes running locally or on Google Cloud Platform
 
-read more about gcp deployments [here](https://github.com/livepeer/test-harness/blob/master/docs/demo.md)
+Read more about GCP deployments [here](https://github.com/livepeer/test-harness/blob/master/docs/demo.md)
