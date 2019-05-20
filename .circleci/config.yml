@@ -20,7 +20,7 @@ jobs:
       - run: export PATH=$PATH:/usr/lib/go-1.11/bin
       - run: apt-get update && apt-get install -y software-properties-common && add-apt-repository ppa:gophers/archive -y && apt-get update && apt-get -y install build-essential pkg-config autoconf gnutls-dev golang-1.11-go sudo git curl
       - run: ./install_ffmpeg.sh
-      - run: ./install_dependencies.sh
+      - run: export PATH=$PATH:/usr/lib/go-1.11/bin ./install_dependencies.sh
 
       - run:
           name: Lint
