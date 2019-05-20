@@ -17,10 +17,9 @@ jobs:
       #     keys:
       #       - v3-pkg-cache
 
-      - run: export PATH=$PATH:/usr/lib/go-1.11/bin
-      - run: apt-get update && apt-get install -y software-properties-common && add-apt-repository ppa:gophers/archive -y && apt-get update && apt-get -y install build-essential pkg-config autoconf gnutls-dev golang-1.11-go sudo git curl
+      - run: apt-get update && apt-get install -y software-properties-common && add-apt-repository ppa:gophers/archive -y && apt-get update && apt-get -y install build-essential pkg-config autoconf gnutls-dev golang-1.11-go sudo git curl && mv /usr/lib/go-1.11/bin/* /usr/lib/bin
       - run: ./install_ffmpeg.sh
-      - run: export PATH=$PATH:/usr/lib/go-1.11/bin ./install_dependencies.sh
+      - run: export ./install_dependencies.sh
 
       - run:
           name: Lint
@@ -30,7 +29,7 @@ jobs:
       - run:
           name: Compile binaries
           command: |
-            PKG_CONFIG_PATH=$HOME/compiled/lib/pkgconfig CPATH=/usr/local/cuda/include LIBRARY_PATH=/usr/local/cuda/lib64 PATH=$PATH:/usr/lib/go-1.11/bin make livepeer livepeer_cli
+            PKG_CONFIG_PATH=$HOME/compiled/lib/pkgconfig CPATH=/usr/local/cuda/include LIBRARY_PATH=/usr/local/cuda/lib64 make livepeer livepeer_cli
 
       - run:
           name: Run unit tests
