@@ -17,6 +17,7 @@ import (
 	"os/user"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -78,6 +79,7 @@ func main() {
 	transcodingOptions := flag.String("transcodingOptions", "P240p30fps16x9,P360p30fps16x9", "Transcoding options for broadcast job")
 	maxSessions := flag.Int("maxSessions", 10, "Maximum number of concurrent transcoding sessions for Orchestrator, maximum number or RTMP streams for Broadcaster, or maximum capacity for transcoder")
 	currentManifest := flag.Bool("currentManifest", false, "Expose the currently active ManifestID as \"/stream/current.m3u8\"")
+	nvidia := flag.String("nvidia", "", "Comma-separated list of Nvidia GPU device IDs to use for transcoding")
 
 	// Onchain:
 	ethAcctAddr := flag.String("ethAcctAddr", "", "Existing Eth account address")
@@ -93,7 +95,6 @@ func main() {
 
 	// Metrics & logging:
 	monitor := flag.Bool("monitor", false, "Set to true to send performance metrics")
-	monUrl := flag.String("monUrl", "", "host name for the metrics data collector")
 	version := flag.Bool("version", false, "Print out the version")
 	verbosity := flag.String("v", "", "Log verbosity.  {4|5|6}")
 	logIPFS := flag.Bool("logIPFS", false, "Set to true if log files should not be generated") // unused until we re-enable IPFS
@@ -114,25 +115,23 @@ func main() {
 
 	if *version {
 		fmt.Println("Livepeer Node Version: " + core.LivepeerVersion)
+		fmt.Printf("Compiler version: %s %s\n", runtime.Compiler, runtime.Version())
 		return
 	}
 
 	type NetworkConfig struct {
 		ethUrl        string
 		ethController string
-		monUrl        string
 	}
 
 	configOptions := map[string]*NetworkConfig{
 		"rinkeby": {
 			ethUrl:        "wss://rinkeby.infura.io/ws/v3/09642b98164d43eb890939eb9a7ec500",
 			ethController: "0x37dc71366ec655093b9930bc816e16e6b587f968",
-			monUrl:        "http://metrics-rinkeby.livepeer.org/api/events",
 		},
 		"mainnet": {
 			ethUrl:        "wss://mainnet.infura.io/ws/v3/be11162798084102a3519541eded12f6",
 			ethController: "0xf96d54e490317c557a967abfa5d6e33006be69b3",
-			monUrl:        "http://metrics-mainnet.livepeer.org/api/events",
 		},
 	}
 
@@ -153,9 +152,6 @@ func main() {
 		}
 		if *ethController == "" {
 			*ethController = netw.ethController
-		}
-		if *monitor && *monUrl == "" {
-			*monUrl = netw.monUrl
 		}
 		glog.Infof("***Livepeer is running on the %v*** network: %v***", *network, *ethController)
 	} else {
@@ -196,7 +192,11 @@ func main() {
 	}
 
 	if *transcoder {
-		n.Transcoder = core.NewLocalTranscoder(*datadir)
+		if *nvidia != "" {
+			n.Transcoder = core.NewNvidiaTranscoder(*nvidia, *datadir)
+		} else {
+			n.Transcoder = core.NewLocalTranscoder(*datadir)
+		}
 	}
 
 	if *orchestrator {
@@ -214,7 +214,6 @@ func main() {
 	}
 
 	if *monitor {
-		glog.Infof("Monitoring endpoint: %s", *monUrl)
 		lpmon.Enabled = true
 		nodeID := *ethAcctAddr
 		if nodeID == "" {
@@ -228,7 +227,7 @@ func main() {
 		case core.TranscoderNode:
 			nodeType = "trcr"
 		}
-		lpmon.Init(*monUrl, nodeType, nodeID, core.LivepeerVersion)
+		lpmon.InitCensus(nodeType, nodeID, core.LivepeerVersion)
 	}
 
 	if n.NodeType == core.TranscoderNode {
