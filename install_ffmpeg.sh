@@ -54,20 +54,20 @@ if [ $(uname) != "Darwin" ]; then
   EXTRA_FFMPEG_FLAGS="--enable-cuda --enable-cuvid --enable-nvenc --enable-libnpp --enable-filter=scale_npp --enable-encoder=h264_nvenc"
 fi
 
-if [ $(uname) == "Linux" ]; then
-  echo "Checking for CUDA and installing."
-  # Check for CUDA and try to install.
-  if ! dpkg-query -W cuda-10-0; then
-    curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-repo-ubuntu1804_10.0.130-1_amd64.deb
-    sudo dpkg -i ./cuda-repo-ubuntu1804_10.0.130-1_amd64.deb
-    sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
-    sudo apt-get update
-    sudo apt-get install cuda-10-0 -y
-  fi
-  EXTRA_FFMPEG_FLAGS="$EXTRA_FFMPEG_FLAGS --extra-cflags=-I/usr/local/cuda/include --extra-ldflags=-L/usr/local/cuda/lib64"
-  # Enable persistence mode
-  # nvidia-smi -pm 1
-fi
+# if [ $(uname) == "Linux" ]; then
+#   echo "Checking for CUDA and installing."
+#   # Check for CUDA and try to install.
+#   if ! dpkg-query -W cuda-10-0; then
+#     curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-repo-ubuntu1804_10.0.130-1_amd64.deb
+#     sudo dpkg -i ./cuda-repo-ubuntu1804_10.0.130-1_amd64.deb
+#     sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
+#     sudo apt-get update
+#     sudo apt-get install cuda-10-0 cuda-runtime-10-0 -y
+#   fi
+#   EXTRA_FFMPEG_FLAGS="$EXTRA_FFMPEG_FLAGS --extra-cflags=-I/usr/local/cuda/include --extra-ldflags=-L/usr/local/cuda/lib64"
+#   # Enable persistence mode
+#   # nvidia-smi -pm 1
+# fi
 
 if [ ! -e "$HOME/ffmpeg/libavcodec/libavcodec.a" ]; then
   git clone --depth 1 -b n4.1 https://git.ffmpeg.org/ffmpeg.git "$HOME/ffmpeg" || echo "FFmpeg dir already exists"
