@@ -8,16 +8,20 @@ jobs:
     environment:
         PKG_CONFIG_PATH: $HOME/compiled/lib/pkgconfig
         TEST_RESULTS: /tmp/test-results
+        BASH_ENV: ~/.bashrc
+        GOPATH: /go
 
     steps:
       - checkout
+      - run: echo 'export PATH=/usr/lib/go-1.11/bin/:/go/bin:$PATH' >> $BASH_ENV
       - run: mkdir -p $TEST_RESULTS
+      - run: mkdir -p /go
 
       # - restore_cache:
       #     keys:
       #       - v3-pkg-cache
 
-      - run: apt-get update && apt-get install -y software-properties-common && add-apt-repository ppa:gophers/archive -y && apt-get update && apt-get -y install build-essential pkg-config autoconf gnutls-dev golang-1.11-go sudo git curl && mv /usr/lib/go-1.11/bin/* /usr/bin
+      - run: apt-get update && apt-get install -y software-properties-common && add-apt-repository ppa:gophers/archive -y && apt-get update && apt-get -y install build-essential pkg-config autoconf gnutls-dev golang-1.11-go sudo git curl
       - run: ./install_ffmpeg.sh
       - run: ./install_dependencies.sh
 
