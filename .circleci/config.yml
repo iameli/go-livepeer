@@ -17,7 +17,7 @@ jobs:
       #     keys:
       #       - v3-pkg-cache
 
-      - run: apt-get update && apt-get install -y software-properties-common && add-apt-repository ppa:gophers/archive -y && apt-get update && apt-get -y install build-essential pkg-config autoconf gnutls-dev golang-1.11-go sudo git curl && mv /usr/lib/go-1.11/bin/* /usr/lib/bin
+      - run: apt-get update && apt-get install -y software-properties-common && add-apt-repository ppa:gophers/archive -y && apt-get update && apt-get -y install build-essential pkg-config autoconf gnutls-dev golang-1.11-go sudo git curl && mv /usr/lib/go-1.11/bin/* /usr/bin
       - run: ./install_ffmpeg.sh
       - run: ./install_dependencies.sh
 
