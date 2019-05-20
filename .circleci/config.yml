@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1-stretch
+      - image: iameli/nvbuild
     working_directory: /go/src/github.com/livepeer/go-livepeer
 
     environment:
