@@ -51,7 +51,7 @@ fi
 
 EXTRA_FFMPEG_FLAGS=""
 if [ $(uname) != "Darwin" ]; then
-  EXTRA_FFMPEG_FLAGS="--enable-cuda --enable-cuvid --enable-nvenc"
+  EXTRA_FFMPEG_FLAGS="--enable-cuda --enable-cuvid --enable-nvenc --enable-libnpp --enable-filter=scale_npp --enable-encoder=h264_nvenc"
 fi
 
 if [ ! -e "$HOME/ffmpeg/libavcodec/libavcodec.a" ]; then
@@ -61,7 +61,7 @@ if [ ! -e "$HOME/ffmpeg/libavcodec/libavcodec.a" ]; then
     --disable-muxers --disable-demuxers --disable-parsers --disable-protocols \
     --disable-encoders --disable-decoders --disable-filters --disable-bsfs \
     --disable-postproc --disable-lzma \
-    --enable-gnutls --enable-libx264 --enable-gpl \
+    --enable-gnutls --enable-libx264 --enable-gpl --enable-nonfree \
     --enable-protocol=https,rtmp,file \
     --enable-muxer=mpegts,hls,segment --enable-demuxer=flv,mpegts \
     --enable-bsf=h264_mp4toannexb,aac_adtstoasc,h264_metadata,h264_redundant_pps \
