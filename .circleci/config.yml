@@ -30,7 +30,7 @@ jobs:
       - run:
           name: Compile binaries
           command: |
-            PKG_CONFIG_PATH=$HOME/compiled/lib/pkgconfig CPATH=/usr/local/cuda/include LIBRARY_PATH=/usr/local/cuda/lib64 make livepeer livepeer_cli
+            PKG_CONFIG_PATH=$HOME/compiled/lib/pkgconfig CPATH=/usr/local/cuda/include LIBRARY_PATH=/usr/local/cuda/lib64 PATH=$PATH:/usr/lib/go-1.11/bin make livepeer livepeer_cli
 
       - run:
           name: Run unit tests
