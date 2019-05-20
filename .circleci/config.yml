@@ -2,12 +2,13 @@ version: 2
 jobs:
   build:
     docker:
-      - image: iameli/nvbuild
+      - image: nvidia/cuda:10.1-devel-ubuntu18.04
     working_directory: /go/src/github.com/livepeer/go-livepeer
 
     environment:
         PKG_CONFIG_PATH: $HOME/compiled/lib/pkgconfig
         TEST_RESULTS: /tmp/test-results
+        PATH: $PATH:/usr/lib/go-1.11/bin
 
     steps:
       - checkout
@@ -17,7 +18,7 @@ jobs:
       #     keys:
       #       - v3-pkg-cache
 
-      - run: sudo apt-get update && sudo apt-get -y install build-essential pkg-config autoconf gnutls-dev
+      - run: sudo add-apt-repository ppa:gophers/archive && sudo apt-get update && sudo apt-get -y install build-essential pkg-config autoconf gnutls-dev golang-1.11-go
       - run: ./install_ffmpeg.sh
       - run: ./install_dependencies.sh
 
