@@ -5,7 +5,9 @@ workflows:
   build_and_test:
     jobs:
       - build-builder
-      - build
+      - build:
+          requires:
+            - build-builder
 
 jobs:
   build-builder:
@@ -28,8 +30,6 @@ jobs:
       - run: docker push livepeer/nvidia-build:latest
 
   build:
-    requires:
-      - build-builder
     docker:
       # Note race condition - we might get the wrong builder if lots of builds are happening in
       # parallel because this pulls it down from Docker Hub.
