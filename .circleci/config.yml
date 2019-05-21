@@ -1,4 +1,12 @@
 version: 2
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build-builder
+      - build
+
 jobs:
   build-builder:
     docker:
@@ -19,7 +27,7 @@ jobs:
 
   build:
     docker:
-      - image: circleci/golang:1-stretch
+      - image: livepeer/nvidia-build
     working_directory: /go/src/github.com/livepeer/go-livepeer
 
     steps:
