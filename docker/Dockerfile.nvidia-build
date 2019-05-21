@@ -14,5 +14,7 @@ RUN apt-get update \
 WORKDIR /root
 ADD ./install_ffmpeg.sh ./install_ffmpeg.sh
 RUN ./install_ffmpeg.sh
+ENV GOPATH /go
+RUN mkdir -p /go
 ADD ./install_dependencies.sh ./install_dependencies.sh
 RUN ./install_dependencies.sh

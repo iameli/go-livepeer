@@ -1,14 +1,14 @@
 version: 2
 jobs:
-  build:
+  build-builder:
     docker:
       - image: circleci/golang:1-stretch
     working_directory: /go/src/github.com/livepeer/go-livepeer
 
     environment:
-        PKG_CONFIG_PATH: $HOME/compiled/lib/pkgconfig
-        BASH_ENV: /root/.bashrc
-        GOPATH: /go
+      PKG_CONFIG_PATH: $HOME/compiled/lib/pkgconfig
+      BASH_ENV: /root/.bashrc
+      GOPATH: /go
 
     steps:
       - checkout
@@ -16,6 +16,13 @@ jobs:
           docker_layer_caching: true
 
       - run: make nvidia-build
+
+  build:
+    docker:
+      - image: livepeer/nvidia-build
+    working_directory: /go/src/github.com/livepeer/go-livepeer
+
+    steps:
       - run: mkdir -p $TEST_RESULTS
 
       # - restore_cache:
@@ -30,13 +37,13 @@ jobs:
       - run:
           name: Compile binaries
           command: |
-            PKG_CONFIG_PATH=$HOME/compiled/lib/pkgconfig CPATH=/usr/local/cuda/include LIBRARY_PATH=/usr/local/cuda/lib64 make livepeer livepeer_cli
+            make livepeer livepeer_cli
 
       - run:
           name: Run unit tests
           command: |
             trap "go-junit-report <${TEST_RESULTS}/go-test.out > ${TEST_RESULTS}/go-test-report.xml" EXIT
-            PKG_CONFIG_PATH=$HOME/compiled/lib/pkgconfig /bin/bash test.sh 2>&1 | tee $TEST_RESULTS/go-test.out
+            bin/bash test.sh 2>&1 | tee $TEST_RESULTS/go-test.out
 
       - run:
           name: Upload build
