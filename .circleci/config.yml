@@ -27,9 +27,9 @@ jobs:
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
 
       # First, build the Linux-specific builder container
-      - run: docker pull iameli/platform-build:latest || echo 'no pre-existing cache found'
-      - run: docker build -t iameli/platform-build --cache-from=iameli/platform-build:latest -f docker/Dockerfile.build-linux .
-      - run: docker push iameli/platform-build:latest
+      - run: docker pull iameli/build-platform:latest || echo 'no pre-existing cache found'
+      - run: docker build -t iameli/build-platform --cache-from=iameli/build-platform:latest -f docker/Dockerfile.build-linux .
+      - run: docker push iameli/build-platform:latest
 
       # Then, build the actual app in a container shared between Linux and Windows
       - run: docker pull iameli/build:latest || echo 'no pre-existing cache found'
