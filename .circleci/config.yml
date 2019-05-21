@@ -26,6 +26,8 @@ jobs:
       - run: make nvidia-build
 
   build:
+    requires:
+      - build-builder
     docker:
       - image: livepeer/nvidia-build
     working_directory: /go/src/github.com/livepeer/go-livepeer
