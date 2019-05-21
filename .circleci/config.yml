@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - checkout
-      - run: touch $BASH_ENV && echo 'export PATH=/usr/lib/go-1.11/bin/:/go/bin:$PATH' >> $BASH_ENV
+      - run: touch $BASH_ENV && echo 'export PATH=/usr/lib/go-1.11/bin:/go/bin:$PATH' >> $BASH_ENV
       - run: mkdir -p $TEST_RESULTS
       - run: mkdir -p /go
 
