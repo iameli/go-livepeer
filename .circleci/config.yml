@@ -8,7 +8,7 @@ jobs:
     environment:
         PKG_CONFIG_PATH: $HOME/compiled/lib/pkgconfig
         TEST_RESULTS: /tmp/test-results
-        BASH_ENV: ~/.bashrc
+        BASH_ENV: /root/.bashrc
         GOPATH: /go
 
     steps:
