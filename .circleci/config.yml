@@ -2,28 +2,25 @@ version: 2
 jobs:
   build:
     docker:
-      - image: nvidia/cuda:10.1-devel-ubuntu18.04
+      - image: circleci/golang:1-stretch
     working_directory: /go/src/github.com/livepeer/go-livepeer
 
     environment:
         PKG_CONFIG_PATH: $HOME/compiled/lib/pkgconfig
-        TEST_RESULTS: /tmp/test-results
         BASH_ENV: /root/.bashrc
         GOPATH: /go
 
     steps:
       - checkout
-      - run: touch $BASH_ENV && echo 'export PATH=/usr/lib/go-1.11/bin:/go/bin:$PATH' >> $BASH_ENV
+      - setup_remote_docker:
+          docker_layer_caching: true
+
+      - run: make nvidia-build
       - run: mkdir -p $TEST_RESULTS
-      - run: mkdir -p /go
 
       # - restore_cache:
       #     keys:
       #       - v3-pkg-cache
-
-      - run: apt-get update && apt-get install -y software-properties-common && add-apt-repository ppa:gophers/archive -y && apt-get update && apt-get -y install build-essential pkg-config autoconf gnutls-dev golang-1.11-go sudo git curl
-      - run: ./install_ffmpeg.sh
-      - run: ./install_dependencies.sh
 
       - run:
           name: Lint
