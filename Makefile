@@ -23,5 +23,5 @@ localdocker:
 	rm .git.describe
 
 .PHONY: docker-nvidia
-docker-nvidia:
+nvidia-build:
 	docker build -t livepeer/nvidia-build -f docker/Dockerfile.nvidia-build .
