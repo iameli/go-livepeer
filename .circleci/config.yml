@@ -24,6 +24,7 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
 
+      - run: docker pull iameli/nvidia-build:latest || echo 'no pre-existing cache found'
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: make nvidia-build
       - run: docker push iameli/nvidia-build:latest

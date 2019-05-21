@@ -24,4 +24,4 @@ localdocker:
 
 .PHONY: docker-nvidia
 nvidia-build:
-	docker build -t iameli/nvidia-build -f docker/Dockerfile.nvidia-build .
+	docker build -t iameli/nvidia-build --cache-from=iameli/nvidia-build -f docker/Dockerfile.nvidia-build .
