@@ -27,13 +27,13 @@ jobs:
 
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: make nvidia-build
-      - run: docker push livepeer/nvidia-build:latest
+      - run: docker push eli/nvidia-build:latest
 
   build:
     docker:
       # Note race condition - we might get the wrong builder if lots of builds are happening in
       # parallel because this pulls it down from Docker Hub.
-      - image: livepeer/nvidia-build:latest
+      - image: eli/nvidia-build:latest
     working_directory: /go/src/github.com/livepeer/go-livepeer
 
     steps:
