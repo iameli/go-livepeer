@@ -16,7 +16,7 @@ jobs:
     working_directory: /go/src/github.com/livepeer/go-livepeer
 
     environment:
-      PKG_CONFIG_PATH: $HOME/compiled/lib/pkgconfig
+      PKG_CONFIG_PATH: /root/compiled/lib/pkgconfig
       GOPATH: /go
 
     steps:
@@ -36,14 +36,13 @@ jobs:
     working_directory: /go/src/github.com/livepeer/go-livepeer
 
     environment:
-      PKG_CONFIG_PATH: $HOME/compiled/lib/pkgconfig
+      PKG_CONFIG_PATH: /root/compiled/lib/pkgconfig
       TEST_RESULTS: /tmp/test-results
       GOPATH: /go
 
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
+
       - run: mkdir -p $TEST_RESULTS
 
       # - restore_cache:
