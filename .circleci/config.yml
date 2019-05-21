@@ -23,13 +23,17 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
 
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: make nvidia-build
+      - run: docker push livepeer/nvidia-build:latest
 
   build:
     requires:
       - build-builder
     docker:
-      - image: livepeer/nvidia-build
+      # Note race condition - we might get the wrong builder if lots of builds are happening in
+      # parallel because this pulls it down from Docker Hub.
+      - image: livepeer/nvidia-build:latest
     working_directory: /go/src/github.com/livepeer/go-livepeer
 
     steps:
