@@ -63,7 +63,7 @@ jobs:
           name: Run unit tests
           command: |
             trap "go-junit-report <${TEST_RESULTS}/go-test.out > ${TEST_RESULTS}/go-test-report.xml" EXIT
-            bin/bash test.sh 2>&1 | tee $TEST_RESULTS/go-test.out
+            /bin/bash test.sh 2>&1 | tee $TEST_RESULTS/go-test.out
 
       - run:
           name: Upload build
