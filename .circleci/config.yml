@@ -24,16 +24,23 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
 
-      - run: docker pull iameli/nvidia-build:latest || echo 'no pre-existing cache found'
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - run: make nvidia-build
-      - run: docker push iameli/nvidia-build:latest
+
+      # First, build the Linux-specific builder container
+      - run: docker pull iameli/platform-build:latest || echo 'no pre-existing cache found'
+      - run: docker build -t iameli/platform-build --cache-from=iameli/platform-build:latest -f docker/Dockerfile.linux-build .
+      - run: docker push iameli/platform-build:latest
+
+      # Then, build the actual app in a container shared between Linux and Windows
+      - run: docker pull iameli/build:latest || echo 'no pre-existing cache found'
+      - run: docker build -t iameli/build --cache-from=iameli/build:latest -f docker/Dockerfile.build .
+      - run: docker push iameli/build:latest
 
   build:
     docker:
       # Note race condition - we might get the wrong builder if lots of builds are happening in
       # parallel because this pulls it down from Docker Hub.
-      - image: iameli/nvidia-build:latest
+      - image: iameli/build:latest
     working_directory: /go/src/github.com/livepeer/go-livepeer
 
     environment:
@@ -54,11 +61,6 @@ jobs:
           name: Lint
           command: |
             gometalinter --disable-all --enable=gofmt --enable=vet --enable=golint --deadline=4m pm
-
-      - run:
-          name: Compile binaries
-          command: |
-            make livepeer livepeer_cli
 
       - run:
           name: Run unit tests

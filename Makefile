@@ -21,7 +21,3 @@ localdocker:
 	# or selectable .dockerignore files
 	-tar ch --exclude=.git . | docker build -t livepeerbinary:debian -f docker/Dockerfile.debian -
 	rm .git.describe
-
-.PHONY: docker-nvidia
-nvidia-build:
-	docker build -t iameli/nvidia-build --cache-from=iameli/nvidia-build -f docker/Dockerfile.nvidia-build .

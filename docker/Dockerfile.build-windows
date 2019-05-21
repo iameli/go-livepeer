@@ -50,11 +50,14 @@ RUN C:\msys64\usr\bin\bash.exe -l -c 'exit 0'; `
   # MSYS2 leaves processes running or something - this step hangs? Hard shutdown to fix that.
   Stop-Computer -Force
 
-WORKDIR C:\msys64
+WORKDIR C:\msys64\go\src\github.com\livepeer\go-livepeer
 
-SHELL ["C:\\msys64\\usr\\bin\\bash.exe", "-l", "-c"]
+ADD docker/run.sh C:\msys64\usr\bin\run.sh
 
-# ADD install_ffmpeg.sh c:\temp\install_ffmpeg.sh
+# Tell MSYS2 not to do "cd $HOME" all the freakin' time
+ENV CHERE_INVOKING 1
+SHELL ["C:\\msys64\\usr\\bin\\bash.exe", "-l", "/usr/bin/run.sh"]
+
 CMD ["C:\\msys64\\usr\\bin\\bash.exe", "-l"]
 
 # # Install FFMpeg, nasm, x264

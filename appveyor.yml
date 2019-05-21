@@ -12,9 +12,17 @@ test_script:
   - gcloud.cmd components update --quiet
   - gcloud.cmd auth activate-service-account --key-file=C:\Users\appveyor\token.json
   - gsutil.cmd cp README.md gs://build.livepeer.live/README.md
-  - docker pull iameli/nvidia-build:latest
-  - docker build -m 4gb --cache-from=iameli/nvidia-build:latest -t iameli/nvidia-build:latest -f .\docker\Dockerfile.windows .
-  - docker push iameli/nvidia-build:latest
+
+  # First, build/cache the platform-specific root container
+  - docker pull iameli/platform-build:latest
+  - docker build -m 4gb --cache-from=iameli/platform-build:latest -t iameli/platform-build:latest -f .\docker\Dockerfile.windows-build .
+  - docker push iameli/platform-build:latest
+
+  # Then, build/cache the container shared between Windows and Linux
+  - docker pull iameli/build:latest
+  - docker build -m 4gb --cache-from=iameli/build:latest -t iameli/build:latest -f .\docker\Dockerfile.build .
+  - docker push iameli/build:latest
+
   - docker create --name wlive iameli/nvidia-build:latest
   - docker cp wlive:c:/temp/livepeer-windows-amd64.zip .
   - docker rm wlive
