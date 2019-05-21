@@ -17,7 +17,6 @@ jobs:
 
     environment:
       PKG_CONFIG_PATH: $HOME/compiled/lib/pkgconfig
-      BASH_ENV: /root/.bashrc
       GOPATH: /go
 
     steps:
@@ -35,6 +34,11 @@ jobs:
       # parallel because this pulls it down from Docker Hub.
       - image: iameli/nvidia-build:latest
     working_directory: /go/src/github.com/livepeer/go-livepeer
+
+    environment:
+      PKG_CONFIG_PATH: $HOME/compiled/lib/pkgconfig
+      TEST_RESULTS: /tmp/test-results
+      GOPATH: /go
 
     steps:
       - checkout
