@@ -3,11 +3,8 @@
 # Don't mess with WORKDIR if you can avoid it, as it's different on Windows/Linux. Use relative
 # paths instead.
 
-FROM iameli/build-platform:latest_DISABLE_PROMPTS 1
-RUN curl https://sdk.cloud.google.com | bash -x
-RUN gcloud --help
+FROM iameli/build-platform:latest
 
->>>>>>> more vm fixes
 ADD ./install_ffmpeg.sh ./install_ffmpeg.sh
 RUN ./install_ffmpeg.sh
 

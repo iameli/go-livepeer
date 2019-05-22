@@ -3,15 +3,6 @@ image: Windows Server 2019
 
 test_script:
   - docker login -u %DOCKER_USER% -p %DOCKER_PASS%
-  - ps: $hash = git describe --always --long --dirty ; $ver = Get-Content VERSION ; $env:FULLVER = "$ver-$hash"
-  - ps: '"Building $env:FULLVER"'
-  - {"ps": "$content = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($env:GCLOUD_TOKEN)) ; $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False ; [System.IO.File]::WriteAllLines('C:\\Users\\appveyor\\token.json', $content, $Utf8NoBomEncoding)"}
-  - choco install gcloudsdk
-  - refreshenv
-  - gcloud.cmd components copy-bundled-python>>python_path.txt && SET /p CLOUDSDK_PYTHON=<python_path.txt && DEL python_path.txt
-  - gcloud.cmd components update --quiet
-  - gcloud.cmd auth activate-service-account --key-file=C:\Users\appveyor\token.json
-  - gsutil.cmd cp README.md gs://build.livepeer.live/README.md
 
   # First, build/cache the platform-specific root container
   - ps: $ErrorActionPreference = 'SilentlyContinue' ; docker pull iameli/build-platform:latest-windows
@@ -25,11 +16,7 @@ test_script:
   - docker tag iameli/build:latest iameli/build:latest-windows
   - docker push iameli/build:latest-windows
 
-  - docker create --name wlive iameli/build-platform:latest
-  - docker cp wlive:c:/temp/livepeer-windows-amd64.zip .
-  - docker rm wlive
-  - gsutil.cmd cp livepeer-windows-amd64.zip "gs://build.livepeer.live/%FULLVER%/livepeer-windows-amd64.zip"
-  - ps: '$body = @{"content" = "Build succeeded ✅`nBranch: $env:APPVEYOR_REPO_BRANCH `nPlatform: windows-amd64`nhttps://build.livepeer.live/$env:FULLVER/livepeer-windows-amd64.zip"} ; Invoke-WebRequest -Uri $env:DISCORD_URL -Method POST -Body $body'
+  - docker run --rm iameli/build:latest -e  ./upload-build.sh
 
 # Don't actually build.
 build: off
