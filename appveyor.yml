@@ -5,13 +5,13 @@ test_script:
   - docker login -u %DOCKER_USER% -p %DOCKER_PASS%
 
   # First, build/cache the platform-specific root container
-  - ps: $ErrorActionPreference = 'Ignore' ; docker pull iameli/build-platform:latest-windows
+  - ps: Start-Process docker -ArgumentList 'pull iameli/build-platform:latest-windows' -Wait -EV Err -EA SilentlyContinue
   - docker build -m 4gb --cache-from=iameli/build-platform:latest-windows -t iameli/build-platform:latest -f .\docker\Dockerfile.build-windows .
   - docker tag iameli/build-platform:latest iameli/build-platform:latest-windows
   - docker push iameli/build-platform:latest-windows
 
   # Then, build/cache the container shared between Windows and Linux
-  - ps: $ErrorActionPreference = 'Ignore' ; docker pull iameli/build:latest-windows
+  - ps: Start-Process docker -ArgumentList 'pull iameli/build:latest-windows' -Wait -EV Err -EA SilentlyContinue
   - docker build -m 4gb --cache-from=iameli/build:latest-windows -t iameli/build:latest -f .\docker\Dockerfile.build .
   - docker tag iameli/build:latest iameli/build:latest-windows
   - docker push iameli/build:latest-windows
