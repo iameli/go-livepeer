@@ -66,6 +66,10 @@ ENV GOPATH "/go"
 
 SHELL ["C:\\msys64\\usr\\bin\\bash.exe", "/usr/bin/run.sh"]
 
+RUN mkdir -p /usr/local/cuda
+RUN ln -s '/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.1/include' /usr/local/cuda/include
+RUN ln -s '/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.1/lib/x64' /usr/local/cuda/lib64
+
 CMD ["C:\\msys64\\usr\\bin\\bash.exe"]
 
 
