@@ -63,6 +63,7 @@ ENV CHERE_INVOKING 1
 ENV PATH "/mingw64/bin:/go/bin:/usr/local/bin:/usr/bin:/bin:/opt/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl"
 ENV HOME /build
 ENV GOPATH "/go"
+ENV GOROOT "/mingw64/lib/go"
 
 SHELL ["C:\\msys64\\usr\\bin\\bash.exe", "/usr/bin/run.sh"]
 
