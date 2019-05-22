@@ -2,9 +2,6 @@
 
 set -ex
 
-export PATH="$HOME/compiled/bin":$PATH
-export PKG_CONFIG_PATH=$HOME/compiled/lib/pkgconfig
-
 # Windows (MSYS2) needs a few tweaks
 if [[ $(uname) == *"MSYS2_NT"* ]]; then
   export PATH="$PATH:/usr/bin:/mingw64/bin"
@@ -13,11 +10,14 @@ if [[ $(uname) == *"MSYS2_NT"* ]]; then
   mkdir -p $HOME
 
   export PATH="$HOME/compiled/bin":$PATH
-  export PKG_CONFIG_PATH=$HOME/compiled/lib/pkgconfig:/mingw64/lib/pkgconfig
+  export PKG_CONFIG_PATH=/mingw64/lib/pkgconfig
 
   export TARGET_OS="--target-os=mingw64"
   export HOST_OS="--host=x86_64-w64-mingw32"
 fi
+
+export PATH="$HOME/compiled/bin":$PATH
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH:-}:$HOME/compiled/lib/pkgconfig"
 
 # NVENC only works on Windows/Linux
 if [ $(uname) != "Darwin" ]; then
@@ -51,7 +51,12 @@ fi
 
 EXTRA_FFMPEG_FLAGS=""
 if [ $(uname) != "Darwin" ]; then
-  EXTRA_FFMPEG_FLAGS="--enable-cuda --enable-cuvid --enable-nvenc"
+  if [ -e "/usr/local/cuda/lib64" ]; then
+    echo "CUDA detected, building ffmpeg with nvenc"
+    EXTRA_FFMPEG_FLAGS="--enable-cuda --enable-cuvid --enable-nvenc --enable-libnpp --enable-filter=scale_npp --enable-encoder=h264_nvenc --extra-cflags=-I/usr/local/cuda/include --extra-ldflags=-L/usr/local/cuda/lib64"
+  else
+    echo "CUDA not detected, skipping nvenc"
+  fi
 fi
 
 if [ ! -e "$HOME/ffmpeg/libavcodec/libavcodec.a" ]; then
@@ -61,7 +66,7 @@ if [ ! -e "$HOME/ffmpeg/libavcodec/libavcodec.a" ]; then
     --disable-muxers --disable-demuxers --disable-parsers --disable-protocols \
     --disable-encoders --disable-decoders --disable-filters --disable-bsfs \
     --disable-postproc --disable-lzma \
-    --enable-gnutls --enable-libx264 --enable-gpl \
+    --enable-gnutls --enable-libx264 --enable-gpl --enable-nonfree \
     --enable-protocol=https,rtmp,file \
     --enable-muxer=mpegts,hls,segment --enable-demuxer=flv,mpegts \
     --enable-bsf=h264_mp4toannexb,aac_adtstoasc,h264_metadata,h264_redundant_pps \
