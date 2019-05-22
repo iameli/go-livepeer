@@ -15,15 +15,15 @@ test_script:
 
   # First, build/cache the platform-specific root container
   - ps: $ErrorActionPreference = 'SilentlyContinue' ; docker pull iameli/build-platform:latest-windows
-  - docker build -m 4gb --cache-from=iameli/build-platform:latest-windows -t iameli/build-platform:latest-windows -f .\docker\Dockerfile.build-windows .
+  - docker build -m 4gb --cache-from=iameli/build-platform:latest-windows -t iameli/build-platform:latest -f .\docker\Dockerfile.build-windows .
+  - docker tag iameli/build-platform:latest iameli/build-platform:latest-windows
   - docker push iameli/build-platform:latest-windows
-  - docker tag iameli/build-platform:latest-windows iameli/build-platform:latest
 
   # Then, build/cache the container shared between Windows and Linux
   - ps: $ErrorActionPreference = 'SilentlyContinue' ; docker pull iameli/build:latest-windows
-  - docker build -m 4gb --cache-from=iameli/build:latest-windows -t iameli/build:latest-windows -f .\docker\Dockerfile.build .
+  - docker build -m 4gb --cache-from=iameli/build:latest-windows -t iameli/build:latest -f .\docker\Dockerfile.build .
+  - docker tag iameli/build:latest iameli/build:latest-windows
   - docker push iameli/build:latest-windows
-  - docker tag iameli/build:latest-windows iameli/build:latest
 
   - docker create --name wlive iameli/build-platform:latest
   - docker cp wlive:c:/temp/livepeer-windows-amd64.zip .

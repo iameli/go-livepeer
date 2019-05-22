@@ -44,7 +44,7 @@ RUN C:\msys64\usr\bin\bash.exe -l -c 'exit 0'; `
   C:\msys64\usr\bin\bash.exe -l -c 'pacman -Syu  --needed --noconfirm --noprogressbar --ask=20'; `
   C:\msys64\usr\bin\bash.exe -l -c 'pacman -Su   --needed --noconfirm --noprogressbar --ask=20'; `
   # Install our packages. Use the mingw-w64-x86_64 version of everything run-time; MSYS2 is apparently slower?
-  C:\msys64\usr\bin\bash.exe -l -c 'pacman -S perl binutils git make autoconf mingw-w64-x86_64-gcc mingw-w64-x86_64-libtool mingw-w64-x86_64-gnutls mingw-w64-x86_64-go mingw-w64-x86_64-pkg-config --noconfirm --noprogressbar --ask=20'; `
+  C:\msys64\usr\bin\bash.exe -l -c 'pacman -S perl binutils git make autoconf zip mingw-w64-x86_64-gcc mingw-w64-x86_64-libtool mingw-w64-x86_64-gnutls mingw-w64-x86_64-go mingw-w64-x86_64-pkg-config mingw-w64-x86_64-python2 --noconfirm --noprogressbar --ask=20'; `
   C:\msys64\usr\bin\bash.exe -l -c 'pacman -Scc --noconfirm'; `
   C:\msys64\usr\bin\bash.exe -l -c 'echo "Successfully installed MSYS2"'; `
   # MSYS2 leaves processes running or something - this step hangs? Hard shutdown to fix that.
@@ -56,12 +56,19 @@ ADD docker/run.sh C:\msys64\usr\bin\run.sh
 
 # Tell MSYS2 not to do "cd $HOME" all the freakin' time
 ENV CHERE_INVOKING 1
-SHELL ["C:\\msys64\\usr\\bin\\bash.exe", "-l", "/usr/bin/run.sh"]
-
-CMD ["C:\\msys64\\usr\\bin\\bash.exe", "-l"]
-
-RUN mkdir /build
+ENV PATH "/mingw64/bin:/go/bin:/usr/local/bin:/usr/bin:/bin:/opt/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl"
 ENV HOME /build
+ENV GOPATH "/go"
+ENV CLOUDSDK_PYTHON /usr/bin/python2
+
+SHELL ["C:\\msys64\\usr\\bin\\bash.exe", "/usr/bin/run.sh"]
+
+RUN python2 --version
+
+CMD ["C:\\msys64\\usr\\bin\\bash.exe"]
+
+
+
 
 # # Install FFMpeg, nasm, x264
 # ADD install_ffmpeg.sh ./install_ffmpeg.sh
