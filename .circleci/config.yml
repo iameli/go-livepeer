@@ -22,25 +22,28 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker:
+          # This actually only exists for paid plans. But it's good luck!
           docker_layer_caching: true
 
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
 
       # First, build the Linux-specific builder container
-      - run: docker pull iameli/build-platform:latest || echo 'no pre-existing cache found'
-      - run: docker build -t iameli/build-platform --cache-from=iameli/build-platform:latest -f docker/Dockerfile.build-linux .
-      - run: docker push iameli/build-platform:latest
+      - run: docker pull iameli/build-platform:latest-linux || echo 'no pre-existing cache found'
+      - run: docker build -t iameli/build-platform --cache-from=iameli/build-platform:latest-linux -f docker/Dockerfile.build-linux .
+      - run: docker push iameli/build-platform:latest-linux
+      - run: docker tag iameli/build-platform:latest-linux iameli/build-platform:latest
 
       # Then, build the actual app in a container shared between Linux and Windows
-      - run: docker pull iameli/build:latest || echo 'no pre-existing cache found'
-      - run: docker build -t iameli/build --cache-from=iameli/build:latest -f docker/Dockerfile.build .
-      - run: docker push iameli/build:latest
+      - run: docker pull iameli/build:latest-linux || echo 'no pre-existing cache found'
+      - run: docker build -t iameli/build --cache-from=iameli/build:latest-linux -f docker/Dockerfile.build .
+      - run: docker push iameli/build:latest-linux
+      - run: docker tag iameli/build:latest-linux iameli/build:latest
 
   build:
     docker:
       # Note race condition - we might get the wrong builder if lots of builds are happening in
       # parallel because this pulls it down from Docker Hub.
-      - image: iameli/build:latest
+      - image: iameli/build:latest-linux
     working_directory: /go/src/github.com/livepeer/go-livepeer
 
     environment:
