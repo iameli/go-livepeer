@@ -16,7 +16,7 @@ test_script:
   - docker tag iameli/build:latest iameli/build:latest-windows
   - docker push iameli/build:latest-windows
 
-  - docker run --rm iameli/build:latest -e GCLOUD_KEY=%GCLOUD_KEY% -e GCLOUD_SECRET=%GCLOUD_SECRET%  -e DISCORD_URL=%DISCORD_URL% ./upload-build.sh
+  - docker run --rm iameli/build:latest -e GCLOUD_KEY=%GCLOUD_KEY% -e GCLOUD_SECRET=%GCLOUD_SECRET%  -e DISCORD_URL=%DISCORD_URL% -e CIRCLE_BRANCH=%APPVEYOR_REPO_BRANCH% ./upload-build.sh
 
 # Don't actually build.
 build: off
