@@ -60,6 +60,9 @@ SHELL ["C:\\msys64\\usr\\bin\\bash.exe", "-l", "/usr/bin/run.sh"]
 
 CMD ["C:\\msys64\\usr\\bin\\bash.exe", "-l"]
 
+RUN mkdir /build
+ENV HOME /build
+
 # # Install FFMpeg, nasm, x264
 # ADD install_ffmpeg.sh ./install_ffmpeg.sh
 # RUN ./install_ffmpeg.sh
