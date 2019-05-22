@@ -14,9 +14,9 @@ test_script:
   - gsutil.cmd cp README.md gs://build.livepeer.live/README.md
 
   # First, build/cache the platform-specific root container
-  - docker pull iameli/platform-build:latest
-  - docker build -m 4gb --cache-from=iameli/platform-build:latest -t iameli/platform-build:latest -f .\docker\Dockerfile.build-windows .
-  - docker push iameli/platform-build:latest
+  - docker pull iameli/build-platform:latest
+  - docker build -m 4gb --cache-from=iameli/build-platform:latest -t iameli/build-platform:latest -f .\docker\Dockerfile.build-windows .
+  - docker push iameli/build-platform:latest
 
   # Then, build/cache the container shared between Windows and Linux
   - docker pull iameli/build:latest
