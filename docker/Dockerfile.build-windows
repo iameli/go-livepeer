@@ -52,7 +52,7 @@ RUN C:\msys64\usr\bin\bash.exe -l -c 'exit 0'; `
 
 RUN (new-object System.Net.WebClient).DownloadFile('https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.168_425.25_win10.exe','C:\temp\cuda_10.1.168_425.25_win10.exe') ; `
   Start-Process .\cuda_10.1.168_425.25_win10.exe -ArgumentList '-s npp_dev_10.1' -Wait `
-  Remove-Item –path .\cuda_10.1.168_425.25_win10.exe
+  Remove-Item .\cuda_10.1.168_425.25_win10.exe
 
 WORKDIR C:\msys64\go\src\github.com\livepeer\go-livepeer
 
