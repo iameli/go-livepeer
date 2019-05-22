@@ -35,7 +35,7 @@ jobs:
 
       # Then, build the actual app in a container shared between Linux and Windows
       - run: docker pull iameli/build:latest-linux || echo 'no pre-existing cache found'
-      - run: docker build -t iameli/build --cache-from=iameli/build:latest-linux -f docker/Dockerfile.build .
+      - run: docker build -t iameli/build:latest-linux --cache-from=iameli/build:latest-linux -f docker/Dockerfile.build .
       - run: docker push iameli/build:latest-linux
       - run: docker tag iameli/build:latest-linux iameli/build:latest
 
