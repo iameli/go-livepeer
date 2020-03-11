@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: retry-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      livepeer.live/app: retry-test
+  strategy:
+    rollingUpdate:
+      maxSurge: 3
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        livepeer.live/app: retry-test
+    spec:
+      terminationGracePeriodSeconds: 1
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: gpu.nvidia.com/model
+                operator: In
+                values:
+                - GeForce_GTX_1070_Ti
+                - GeForce_GTX_1070
+              - key: gpu.nvidia.com/count
+                operator: In
+                values:
+                - "8"
+      containers:
+      - name: broadcaster
+        image: iameli/retry-test
+        imagePullPolicy: Always
+        command:
+          - /usr/bin/livepeer
+        args:
+          - -broadcaster
+          - -maxSessions=200
+          - -rtmpAddr=0.0.0.0:1935
+          - -cliAddr=0.0.0.0:7936
+          - -httpAddr=0.0.0.0:8936
+          - -orchAddr=127.0.0.1:8935
+          - -monitor=true
+          - -transcodingOptions=P240p30fps16x9,P360p30fps16x9,P576p30fps16x9,P720p30fps16x9
+          - -datadir=/root/.lpData/broadcaster
+          - -v=9
+        volumeMounts:
+        - mountPath: /root/.lpData
+          name: lp-data
+      - name: orchestrator
+        env:
+        - name: NVIDIA_DRIVER_CAPABILITIES
+          value: compute,video,utility
+        image: iameli/retry-test
+        imagePullPolicy: Always
+        command:
+          - /usr/bin/livepeer
+        args:
+        - -orchestrator
+        - -transcoder
+        - -maxSessions=200
+        - -cliAddr=0.0.0.0:7935
+        - -serviceAddr=127.0.0.1:8935
+        - -monitor=true
+        # - -nvidia=0,1,2,3,4,5
+        - -datadir=/root/.lpData/orchestrator
+        - -v=9
+        volumeMounts:
+        - mountPath: /root/.lpData
+          name: lp-data
+      volumes:
+      - emptyDir:
+          medium: Memory
+        name: lp-data
