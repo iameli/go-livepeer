@@ -1,5 +1,5 @@
 kind: pipeline
-type: docker
+type: kubernetes
 name: linux
 
 platform:
@@ -7,7 +7,56 @@ platform:
   os: linux
 
 steps:
+- name: wait-for-images
+  image: ya7ya/wait-for-docker:latest
+  commands:
+  - echo $(echo $DRONE_TARGET_BRANCH | sed 's/\\//-/g' | tr -cd '[:alnum:]_-') > /drone/src/lp_image && cat /drone/src/lp_image && /wait-for-it.sh -h livepeer/go-livepeer -p $(cat /drone/src/lp_image) -t 5 -r 10
+- name: broadcaster
+  group: test
+  detach: true
+  image: livepeer/go-livepeer:${DRONE_COMMIT_SHA:0:8}
+  settings:
+    digest: ${DRONE_COMMIT_SHA:0:8}
+  depends_on:
+  - wait-for-images
+  commands:
+  - /usr/bin/livepeer -broadcaster -network offchain -maxSessions=200 -rtmpAddr=localhost:1935 -cliAddr=localhost:7935 -httpAddr=localhost:8935 -orchAddr=localhost:8936 -monitor=true -transcodingOptions=P240p30fps16x9,P360p30fps16x9,P576p30fps16x9,P720p30fps16x9 -v=9
+- name: orchestrator
+  group: test
+  detach: true
+  image: livepeer/go-livepeer:${DRONE_COMMIT_SHA:0:8}
+  settings:
+    digest: ${DRONE_COMMIT_SHA:0:8}
+  depends_on:
+  - wait-for-images
+  environment:
+    NVIDIA_DRIVER_CAPABILITIES: compute,video,utility
+    NVIDIA : 0,1,2,3,4,5,6,7
+    DRONE_RESOURCE_LIMIT_GPU: "8"
+  commands: 
+  - /usr/bin/livepeer -v=9 -orchestrator -network offchain -transcoder -monitor=true -cliAddr=localhost:7936 -httpAddr=localhost:8936 -serviceAddr=localhost:8936 -maxSessions=80 -nvidia=0,1,2,3,4,5,6
+  resources:
+    limits:
+      nvidia.com/gpu: 8
 - name: build
   image: golang:1.13
+  environment:
+      PKG_CONFIG_PATH: /root/compiled/lib/pkgconfig
+      GOPATH: /go
+      DOCKER_CLI_EXPERIMENTAL: enabled
   commands:
-  - echo 'hi'
+  - pwd
+  - echo $DRONE_TARGET_BRANCH $DRONE_COMMIT_SHA
+  - cd /drone/src
+  - wget https://storage.googleapis.com/lp_testharness_assets/official_test_source_2s_keys_24pfs_3min.mp4
+- name: stream-tester
+  group: test
+  image: livepeer/streamtester:latest
+  depends_on:
+  - wait-for-images
+  - orchestrator
+  - broadcaster
+  environment:
+    GODEBUG: http2client=0
+  commands:
+    - /root/streamtester -no-bar -latency  -host 'localhost' -rtmp 1935 -media 8935 -profiles '4' -v '1' -file=/drone/src/official_test_source_2s_keys_24pfs_3min.mp4
