@@ -17,7 +17,7 @@ core/test_segment.go:
 version=$(shell cat VERSION)
 
 ldflags := -X github.com/livepeer/go-livepeer/core.LivepeerVersion=$(shell ./print_version.sh)
-cgo_ldflags :=
+cgo_ldflags := -lgmp -lnettle -lhogweed -lncrypt -lcrypt32 -lwsock32 -lws2_32 -lwinpthread
 
 uname_s := $(shell uname -s)
 ifeq ($(uname_s),Darwin)
